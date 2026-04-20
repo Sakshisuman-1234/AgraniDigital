@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "vercel-build": "cd agranidigital && npm install && npm run build && mv dist ../dist",
     "dev": "cd agranidigital && npm run dev",
     "build": "cd agranidigital && npm run build",
     "preview": "cd agranidigital && npm run preview"
