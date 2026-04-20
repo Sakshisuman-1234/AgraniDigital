@@ -1,65 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { dropdownContent } from '../data/navigationData';
 import agraniLogo from '../assets/agranidigital-logo.jpeg';
-
-// Dropdown content data for each section
-const dropdownContent = {
-  Services: {
-    title: "Our Services",
-    items: [
-      { name: "AI & Machine Learning", description: "Intelligent automation and predictive analytics", icon: "🤖", link: "/services/ai-ml" },
-      { name: "Cloud Solutions", description: "AWS, Azure, Google Cloud expertise", icon: "☁️", link: "/services/cloud" },
-      { name: "SaaS Development", description: "Scalable software as a service platforms", icon: "📱", link: "/services/saas" },
-      { name: "Digital Transformation", description: "End-to-end digital modernization", icon: "🚀", link: "/services/digital-transformation" },
-      { name: "Cybersecurity", description: "Protect your business assets", icon: "🔒", link: "/services/cybersecurity" },
-      { name: "Data Analytics", description: "Turn data into actionable insights", icon: "📊", link: "/services/data-analytics" }
-    ]
-  },
-  Products: {
-    title: "Our Products",
-    items: [
-      { name: "AgriSmart AI", description: "AI-powered farming solutions", icon: "🌾", link: "/products/agrismart" },
-      { name: "FinSecure", description: "Banking & financial security suite", icon: "💰", link: "/products/finsecure" },
-      { name: "HealthTrack Pro", description: "Healthcare management platform", icon: "🏥", link: "/products/healthtrack" },
-      { name: "EduTech LMS", description: "Learning management system", icon: "📚", link: "/products/edutech" },
-      { name: "RetailAI", description: "Smart retail analytics", icon: "🛍️", link: "/products/retailai" },
-      { name: "LogiFlow", description: "Supply chain optimization", icon: "🚚", link: "/products/logiflow" }
-    ]
-  },
-  Industries: {
-    title: "Industries We Serve",
-    items: [
-      { name: "Banking & Finance", description: "Secure, compliant financial solutions", icon: "🏦", link: "/industries/banking" },
-      { name: "Healthcare", description: "HIPAA compliant health tech", icon: "💊", link: "/industries/healthcare" },
-      { name: "Retail & E-commerce", description: "Customer-first shopping experiences", icon: "🛒", link: "/industries/retail" },
-      { name: "Manufacturing", description: "Industry 4.0 smart factories", icon: "🏭", link: "/industries/manufacturing" },
-      { name: "Education", description: "EdTech for modern learning", icon: "🎓", link: "/industries/education" },
-      { name: "Logistics", description: "Real-time tracking & optimization", icon: "📦", link: "/industries/logistics" }
-    ]
-  },
-  "Case Studies": {
-    title: "Success Stories",
-    items: [
-      { name: "Global Bank Digital Transformation", description: "40% efficiency increase", icon: "🏆", link: "/case-studies/bank-transformation" },
-      { name: "E-commerce AI Recommendation Engine", description: "150% revenue growth", icon: "📈", link: "/case-studies/ecommerce-ai" },
-      { name: "Healthcare Data Platform", description: "Patient outcomes improved by 60%", icon: "❤️", link: "/case-studies/healthcare-platform" },
-      { name: "Smart City IoT Integration", description: "30% energy savings", icon: "🌆", link: "/case-studies/smart-city" },
-      { name: "Retail Inventory Management", description: "Reduced waste by 45%", icon: "📊", link: "/case-studies/retail-inventory" },
-      { name: "Manufacturing Predictive Maintenance", description: "Downtime reduced by 55%", icon: "⚙️", link: "/case-studies/manufacturing" }
-    ]
-  },
-  Corporate: {
-    title: "Corporate",
-    items: [
-      { name: "About Us", description: "Our story, mission & values", icon: "👥", link: "/about" },
-      { name: "Leadership", description: "Meet our expert team", icon: "👔", link: "/leadership" },
-      { name: "Careers", description: "Join our growing team", icon: "💼", link: "/careers" },
-      { name: "News & Press", description: "Latest announcements", icon: "📰", link: "/news" },
-      { name: "Blog", description: "Insights & updates", icon: "✍️", link: "/blog" },
-      { name: "Investor Relations", description: "Financial information", icon: "📊", link: "/investors" }
-    ]
-  }
-};
 
 const navItems = [
   { label: 'Services', hasArrow: true },
@@ -100,14 +42,31 @@ function MenuIcon({ open }) {
 }
 
 const Navbar = ({ openContact }) => {
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpenMenus, setMobileOpenMenus] = useState({});
   const location = useLocation();
-
+  const navigate = useNavigate();
+  
   useEffect(() => {
     setMenuOpen(false);
     setMobileOpenMenus({});
+    setActiveDropdown(null);
   }, [location.pathname]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.ag-nav-item')) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleNavClick = (label) => {
+    setActiveDropdown(prev => prev === label ? null : label);
+  };
 
   const toggleMobileSubmenu = (label) => {
     setMobileOpenMenus(prev => ({
@@ -121,34 +80,353 @@ const Navbar = ({ openContact }) => {
     if (openContact && typeof openContact === 'function') {
       openContact();
     } else {
-      console.log('Contact button clicked - you can connect this to a modal');
+      navigate('/contact');
     }
   };
 
+  const handleLoginClick = (e) => {
+    e.preventDefault();
+    navigate('/login');
+  };
+
   // Desktop Dropdown Component
-  const DesktopDropdown = ({ label, data }) => {
-    if (!data) return null;
+  const DesktopDropdown = ({ label, data, isOpen }) => {
+    if (!data || !isOpen) return null;
+    
+    // Check if it's a mega-menu dropdown (Services, Products, Industries, Case Studies, or Corporate)
+    if (label === 'Services' || label === 'Products' || label === 'Industries' || label === 'Case Studies' || label === 'Corporate') {
+      const isServices = label === 'Services';
+      const isProducts = label === 'Products';
+      const isIndustries = label === 'Industries';
+      const isCaseStudies = label === 'Case Studies';
+      const isCorporate = label === 'Corporate';
+      return (
+        <div className="ag-dropdown services-mega-page">
+          {/* Scrollable Content Area */}
+          <div className="ag-mega-content-scroll">
+            <div className="ag-mega-columns">
+               {/* Column 1: Featured Section */}
+               <div className="ag-mega-col col-featured">
+                  <div className="ag-mega-col-inner">
+                    <h4 className="ag-mega-col-title-top">
+                      {isServices ? '🏆' : isProducts ? '⭐' : isIndustries ? '🏛️' : isCaseStudies ? '💼' : '🌟'} {data.featured.title}
+                    </h4>
+                    <div className="ag-mega-col-benefits">
+                      {data.featured.benefits.map((b, i) => (
+                        <div key={i} className="ag-mega-benefit-item">
+                          <span className="ag-mega-benefit-tick">✓</span>
+                          {b}
+                        </div>
+                      ))}
+                    </div>
+                    <Link to={data.featured.link} className="ag-mega-featured-btn">
+                      {data.featured.cta} <span>→</span>
+                    </Link>
+                  </div>
+               </div>
+
+               {/* Render Categories Dynamically based on structure */}
+               {isServices ? (
+                 <>
+                   {/* Column 2: AI & Cloud */}
+                   <div className="ag-mega-col col-services">
+                      <div className="ag-mega-col-inner">
+                        <div className="ag-mega-section">
+                          <div className="ag-mega-header-wrap">
+                            <h4 className="ag-mega-section-title">🤖 ARTIFICIAL INTELLIGENCE</h4>
+                          </div>
+                          <div className="ag-mega-services-list">
+                            {data.categories[0].items.map((item, idx) => (
+                              <Link key={idx} to={item.link} className="ag-mega-service-item compact">
+                                <span className="ag-mega-service-icon-bg small">{item.icon}</span>
+                                <div className="ag-mega-service-text">
+                                  <div className="ag-mega-service-name small">{item.name}</div>
+                                  <div className="ag-mega-service-desc small">{item.description}</div>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="ag-mega-section" style={{ marginTop: '16px' }}>
+                          <div className="ag-mega-header-wrap">
+                            <h4 className="ag-mega-section-title">☁️ CLOUD SERVICES</h4>
+                          </div>
+                          <div className="ag-mega-services-list">
+                            {data.categories[1].items.map((item, idx) => (
+                              <Link key={idx} to={item.link} className="ag-mega-service-item compact">
+                                <span className="ag-mega-service-icon-bg small">{item.icon}</span>
+                                <div className="ag-mega-service-text">
+                                  <div className="ag-mega-service-name small">{item.name}</div>
+                                  <div className="ag-mega-service-desc small">{item.description}</div>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                   </div>
+
+                   {/* Column 3: DevOps & Web */}
+                   <div className="ag-mega-col col-services">
+                      <div className="ag-mega-col-inner">
+                        <div className="ag-mega-section">
+                          <div className="ag-mega-header-wrap">
+                            <h4 className="ag-mega-section-title">🛠️ DEVOPS & IOT</h4>
+                          </div>
+                          <div className="ag-mega-services-list">
+                            {data.categories[2].items.map((item, idx) => (
+                              <Link key={idx} to={item.link} className="ag-mega-service-item compact">
+                                <span className="ag-mega-service-icon-bg small">{item.icon}</span>
+                                <div className="ag-mega-service-text">
+                                  <div className="ag-mega-service-name small">{item.name}</div>
+                                  <div className="ag-mega-service-desc small">{item.description}</div>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="ag-mega-section" style={{ marginTop: '16px' }}>
+                          <div className="ag-mega-header-wrap">
+                            <h4 className="ag-mega-section-title">🌐 WEB DEVELOPMENT</h4>
+                          </div>
+                          <div className="ag-mega-services-list">
+                            {data.categories[3].items.map((item, idx) => (
+                              <Link key={idx} to={item.link} className="ag-mega-service-item compact">
+                                <span className="ag-mega-service-icon-bg small">{item.icon}</span>
+                                <div className="ag-mega-service-text">
+                                  <div className="ag-mega-service-name small">{item.name}</div>
+                                  <div className="ag-mega-service-desc small">{item.description}</div>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                   </div>
+
+                   {/* Column 4: Mobile & Enterprise */}
+                   <div className="ag-mega-col col-services">
+                      <div className="ag-mega-col-inner">
+                        <div className="ag-mega-section">
+                          <div className="ag-mega-header-wrap">
+                            <h4 className="ag-mega-section-title">📱 MOBILE APP</h4>
+                          </div>
+                          <div className="ag-mega-services-list">
+                            {data.categories[4].items.map((item, idx) => (
+                              <Link key={idx} to={item.link} className="ag-mega-service-item compact">
+                                <span className="ag-mega-service-icon-bg small">{item.icon}</span>
+                                <div className="ag-mega-service-text">
+                                  <div className="ag-mega-service-name small">{item.name}</div>
+                                  <div className="ag-mega-service-desc small">{item.description}</div>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="ag-mega-section" style={{ marginTop: '16px' }}>
+                          <div className="ag-mega-header-wrap">
+                            <h4 className="ag-mega-section-title">🚀 DIGITAL & ENTERPRISE</h4>
+                          </div>
+                          <div className="ag-mega-services-list">
+                            {data.categories[5].items.map((item, idx) => (
+                              <Link key={idx} to={item.link} className="ag-mega-service-item compact">
+                                <span className="ag-mega-service-icon-bg small">{item.icon}</span>
+                                <div className="ag-mega-service-text">
+                                  <div className="ag-mega-service-name small">{item.name}</div>
+                                  <div className="ag-mega-service-desc small">{item.description}</div>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                   </div>
+                 </>
+               ) : (
+                 /* Products and Industries Flexible Layout */
+                 <>
+                    {/* Column 2: First set of categories */}
+                    <div className="ag-mega-col col-services">
+                       <div className="ag-mega-col-inner">
+                         {data.categories[0] && (
+                           <div className="ag-mega-section">
+                             <div className="ag-mega-header-wrap">
+                               <h4 className="ag-mega-section-title">
+                                 {isProducts ? '⚙️' : isIndustries ? '⚖️' : isCaseStudies ? '💼' : isCorporate ? '🌟' : '🎓'} {data.categories[0].title}
+                               </h4>
+                             </div>
+                             <div className="ag-mega-services-list">
+                               {data.categories[0].items.map((item, idx) => (
+                                 <Link key={idx} to={item.link} className="ag-mega-service-item compact">
+                                   <span className="ag-mega-service-icon-bg small">{item.icon}</span>
+                                   <div className="ag-mega-service-text">
+                                     <div className="ag-mega-service-name small">{item.name}</div>
+                                     <div className="ag-mega-service-desc small">{item.description}</div>
+                                   </div>
+                                 </Link>
+                               ))}
+                             </div>
+                           </div>
+                         )}
+                         {data.categories[1] && (
+                           <div className="ag-mega-section" style={{ marginTop: '16px' }}>
+                             <div className="ag-mega-header-wrap">
+                               <h4 className="ag-mega-section-title">
+                                 {isProducts ? '📚' : isIndustries ? '🏭' : isCaseStudies ? '💼' : isCorporate ? '🌟' : '🏭'} {data.categories[1].title}
+                               </h4>
+                             </div>
+                             <div className="ag-mega-services-list">
+                               {data.categories[1].items.map((item, idx) => (
+                                 <Link key={idx} to={item.link} className="ag-mega-service-item compact">
+                                   <span className="ag-mega-service-icon-bg small">{item.icon}</span>
+                                   <div className="ag-mega-service-text">
+                                     <div className="ag-mega-service-name small">{item.name}</div>
+                                     <div className="ag-mega-service-desc small">{item.description}</div>
+                                   </div>
+                                 </Link>
+                               ))}
+                             </div>
+                           </div>
+                         )}
+                       </div>
+                    </div>
+
+                   {/* Column 3: Second set of categories */}
+                   <div className="ag-mega-col col-services">
+                      <div className="ag-mega-col-inner">
+                        {data.categories[2] && (
+                          <div className="ag-mega-section">
+                            <div className="ag-mega-header-wrap">
+                              <h4 className="ag-mega-section-title">
+                                {isProducts ? '🌾' : isIndustries ? '🛒' : isCaseStudies ? '💼' : isCorporate ? '🌟' : '🛒'} {data.categories[2].title}
+                              </h4>
+                            </div>
+                            <div className="ag-mega-services-list">
+                              {data.categories[2].items.map((item, idx) => (
+                                <Link key={idx} to={item.link} className="ag-mega-service-item compact">
+                                  <span className="ag-mega-service-icon-bg small">{item.icon}</span>
+                                  <div className="ag-mega-service-text">
+                                    <div className="ag-mega-service-name small">{item.name}</div>
+                                    <div className="ag-mega-service-desc small">{item.description}</div>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {data.categories[3] && (
+                          <div className="ag-mega-section" style={{ marginTop: '16px' }}>
+                            <div className="ag-mega-header-wrap">
+                              <h4 className="ag-mega-section-title">
+                                {isProducts ? '🏥' : isIndustries ? '🏢' : isCaseStudies ? '💼' : isCorporate ? '🌟' : '🏢'} {data.categories[3].title}
+                              </h4>
+                            </div>
+                            <div className="ag-mega-services-list">
+                              {data.categories[3].items.map((item, idx) => (
+                                <Link key={idx} to={item.link} className="ag-mega-service-item compact">
+                                  <span className="ag-mega-service-icon-bg small">{item.icon}</span>
+                                  <div className="ag-mega-service-text">
+                                    <div className="ag-mega-service-name small">{item.name}</div>
+                                    <div className="ag-mega-service-desc small">{item.description}</div>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                   </div>
+
+                   {/* Column 4: Third set or core platforms */}
+                   <div className="ag-mega-col col-services">
+                      <div className="ag-mega-col-inner">
+                        {data.categories[4] && (
+                          <div className="ag-mega-section">
+                            <div className="ag-mega-header-wrap">
+                              <h4 className="ag-mega-section-title">
+                                {isProducts ? '💎' : isIndustries ? '⚙️' : isCaseStudies ? '💼' : '⚙️'} {data.categories[4].title}
+                              </h4>
+                            </div>
+                            <div className="ag-mega-services-list">
+                              {data.categories[4].items.map((item, idx) => (
+                                <Link key={idx} to={item.link} className="ag-mega-service-item compact">
+                                  <span className="ag-mega-service-icon-bg small">{item.icon}</span>
+                                  <div className="ag-mega-service-text">
+                                    <div className="ag-mega-service-name small">{item.name}</div>
+                                    <div className="ag-mega-service-desc small">{item.description}</div>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {data.categories[5] && (
+                          <div className="ag-mega-section" style={{ marginTop: '16px' }}>
+                            <div className="ag-mega-header-wrap">
+                              <h4 className="ag-mega-section-title">
+                                {isProducts ? '🏗️' : isIndustries ? '🏘️' : isCaseStudies ? '💼' : '🏠'} {data.categories[5].title}
+                              </h4>
+                            </div>
+                            <div className="ag-mega-services-list">
+                              {data.categories[5].items.map((item, idx) => (
+                                <Link key={idx} to={item.link} className="ag-mega-service-item compact">
+                                  <span className="ag-mega-service-icon-bg small">{item.icon}</span>
+                                  <div className="ag-mega-service-text">
+                                    <div className="ag-mega-service-name small">{item.name}</div>
+                                    <div className="ag-mega-service-desc small">{item.description}</div>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                   </div>
+                 </>
+               )}
+            </div>
+          </div>
+
+          {/* Fixed Footer Strip (Patti) */}
+          <div className="ag-mega-footer-strip">
+             <div className="ag-mega-footer-left">
+                <span className="ag-mega-footer-icon">🎧</span>
+                <div className="ag-mega-footer-text">
+                  <strong>Need Expert Advice?</strong>
+                  <span>Talk to our experts today</span>
+                </div>
+             </div>
+             <div className="ag-mega-footer-right">
+                <Link to="/schedule" className="ag-mega-footer-btn-outline">
+                   Schedule a Call
+                </Link>
+                <Link to="/consultation" className="ag-mega-footer-btn-fill">
+                   Free Consultation
+                </Link>
+             </div>
+          </div>
+        </div>
+      );
+    }
     
     return (
       <div className="ag-dropdown">
         <div className="ag-dropdown-inner">
-          <div className="ag-dropdown-header">
-            <h3>{data.title}</h3>
-            <Link to={`/${label.toLowerCase().replace(/\s+/g, '')}`} className="ag-dropdown-view-all">
-              View All <span>→</span>
-            </Link>
-          </div>
-          <div className="ag-dropdown-grid">
-            {data.items.map((item, idx) => (
-              <Link key={idx} to={item.link} className="ag-dropdown-item">
-                <span className="ag-dropdown-icon">{item.icon}</span>
-                <div className="ag-dropdown-item-content">
-                  <div className="ag-dropdown-item-name">{item.name}</div>
-                  <div className="ag-dropdown-item-desc">{item.description}</div>
-                </div>
-                <span className="ag-dropdown-arrow">→</span>
-              </Link>
-            ))}
+          <div className="ag-dropdown-main">
+            <div className="ag-dropdown-header">
+              <h3>{data.title}</h3>
+            </div>
+            <div className="ag-dropdown-grid">
+              {data.items.map((item, idx) => (
+                <Link key={idx} to={item.link} className="ag-dropdown-item">
+                  <span className="ag-dropdown-icon">{item.icon}</span>
+                  <div className="ag-dropdown-item-content">
+                    <div className="ag-dropdown-item-name">{item.name}</div>
+                    <div className="ag-dropdown-item-desc">{item.description}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -183,6 +461,7 @@ const Navbar = ({ openContact }) => {
           align-items: center;
           justify-content: space-between;
           gap: 32px;
+          position: relative; /* Base for dropdown positioning */
         }
         
         .ag-brand {
@@ -230,7 +509,10 @@ const Navbar = ({ openContact }) => {
           gap: 4px;
         }
         .ag-nav-item {
-          position: relative;
+          /* Spans full height of mainbar to eliminate hover gaps */
+          display: flex;
+          align-items: center;
+          height: 74px; /* Matches ag-mainbar min-height */
         }
         .ag-nav-link {
           display: flex;
@@ -278,31 +560,413 @@ const Navbar = ({ openContact }) => {
           box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
         }
         
-        /* Desktop Dropdown Styles */
         .ag-dropdown {
           position: absolute;
-          top: calc(100% + 8px);
+          top: 74px; /* Align exactly to bottom of nav bar */
           left: 50%;
-          transform: translateX(-50%) translateY(-10px);
+          transform: translateX(-50%);
           width: 680px;
-          max-width: 90vw;
+          max-width: 95vw;
           background: #fff;
           border-radius: 20px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
-          opacity: 0;
-          visibility: hidden;
-          transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
           z-index: 1000;
-          pointer-events: none;
+          overflow: visible; /* Changed from hidden to allow bridge */
+          animation: agSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .ag-nav-item:hover .ag-dropdown {
-          opacity: 1;
-          visibility: visible;
-          pointer-events: auto;
-          transform: translateX(-50%) translateY(0);
+
+        /* Robust Bridge for regular dropdown */
+        .ag-dropdown::before {
+          content: '';
+          position: absolute;
+          top: -30px;
+          left: 0;
+          right: 0;
+          height: 30px;
+          background: transparent;
+        }
+
+        .ag-dropdown-inner {
+          overflow: hidden;
+          border-radius: 20px;
+          background: #fff;
+        }
+        
+        @keyframes agSlideDown {
+          from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .services-mega-page {
+          position: absolute;
+          top: 74px; /* Align exactly to bottom of nav bar */
+          left: 0 !important;
+          width: 100% !important;
+          max-width: 1400px;
+          max-height: 55vh;
+          display: flex;
+          flex-direction: column;
+          background: #fff;
+          border-top: 3px solid #123b71;
+          box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15);
+          transform: none !important;
+          z-index: 1000;
+        }
+
+        /* Robust Hover Bridge for mega-menus */
+        .services-mega-page::before {
+          content: '';
+          position: absolute;
+          top: -30px;
+          left: 0;
+          right: 0;
+          height: 30px;
+          background: transparent;
+        }
+
+        .ag-mega-content-scroll {
+          flex: 1;
+          overflow-y: auto;
+          padding-bottom: 20px;
+        }
+
+        /* Clean scrollbar for the mega menu content */
+        .ag-mega-content-scroll::-webkit-scrollbar {
+          width: 6px;
+        }
+        .ag-mega-content-scroll::-webkit-scrollbar-track {
+          background: #f1f5f9;
+        }
+        .ag-mega-content-scroll::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 10px;
+        }
+        .ag-mega-content-scroll::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8;
+        }
+
+        .ag-mega-columns {
+          display: flex;
+          height: 100%;
+          padding: 0 40px; /* Match navbar padding to align with logo/links */
+        }
+
+        .ag-mega-col {
+          padding: 20px;
+        }
+
+        .col-featured {
+          flex: 0 0 280px;
+          background: linear-gradient(180deg, #f8fbff 0%, #eff6ff 100%);
+          border-right: 1px solid #eef2f6;
+          padding: 30px 24px;
+        }
+
+        .ag-mega-col-title-top {
+          font-size: 16px;
+          font-weight: 800;
+          color: #123b71;
+          margin: 0 0 20px 0;
+          line-height: 1.3;
+        }
+
+        .ag-mega-col-benefits {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-bottom: 24px;
+        }
+
+        .ag-mega-benefit-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 12px;
+          font-weight: 600;
+          color: #475569;
+        }
+
+        .ag-mega-benefit-tick {
+          color: #10b981;
+          font-weight: 800;
+        }
+
+        .ag-mega-featured-btn {
+          display: inline-block;
+          background: #123b71;
+          color: #fff;
+          text-decoration: none;
+          padding: 10px 16px;
+          border-radius: 8px;
+          font-size: 12px;
+          font-weight: 700;
+          transition: all 0.2s ease;
+        }
+
+        .ag-mega-featured-btn:hover {
+          background: #2357d8;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 15px rgba(18, 59, 113, 0.2);
+        }
+
+        .col-services {
+          flex: 1;
+          background: #fff;
+          border-right: 1px solid #f1f5f9;
+        }
+        .col-services:last-child {
+          border-right: none;
+        }
+
+        .ag-mega-header-wrap {
+          margin-bottom: 16px;
+        }
+
+        .ag-mega-section-title {
+          font-size: 13px; /* Increased from 11px */
+          font-weight: 800;
+          color: #123b71; /* Darker blue for intensity */
+          letter-spacing: 0.05em;
+          margin: 0;
+          text-transform: uppercase;
+        }
+
+        .ag-mega-services-list {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .ag-mega-service-item.compact {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 4px 8px;
+          border-radius: 6px;
+          text-decoration: none;
+          transition: all 0.2s ease;
+        }
+
+        .ag-mega-service-item.compact:hover {
+          background: #f8fbff;
+          transform: translateX(4px);
+        }
+
+        .ag-mega-service-icon-bg.small {
+          font-size: 16px;
+          width: 32px;
+          height: 32px;
+          background: #f1f5f9;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .ag-mega-service-text {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+        }
+
+        .ag-mega-service-name.small {
+          font-size: 12px;
+          font-weight: 700;
+          color: #1a202c;
+          margin-bottom: 2px;
+        }
+
+        .ag-mega-service-desc.small {
+          font-size: 10.5px;
+          color: #64748b;
+          line-height: 1.4;
+          max-width: 220px;
+          display: block;
+          white-space: pre-line; /* Support multi-line descriptions */
+        }
+
+        .ag-mega-footer-strip {
+          background: #f8fbff;
+          border-top: 1px solid #eef2f6;
+          padding: 16px 40px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+        }
+
+        .ag-mega-footer-left {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .ag-mega-footer-icon {
+          font-size: 24px;
+        }
+
+        .ag-mega-footer-text {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+        }
+
+        .ag-mega-footer-text strong {
+          font-size: 14px;
+          color: #123b71;
+        }
+
+        .ag-mega-footer-text span {
+          font-size: 11px;
+          color: #64748b;
+        }
+
+        .ag-mega-footer-right {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .ag-mega-footer-btn-outline {
+          text-decoration: none;
+          font-size: 12px;
+          font-weight: 700;
+          color: #123b71;
+          padding: 8px 16px;
+          border-radius: 8px;
+          border: 1px solid #cbd5e1;
+          background: #fff;
+          transition: all 0.2s ease;
+        }
+
+        .ag-mega-footer-btn-outline:hover {
+          background: #f8fbff;
+          border-color: #123b71;
+        }
+
+        .ag-mega-footer-btn-fill {
+          text-decoration: none;
+          font-size: 12px;
+          font-weight: 700;
+          color: #fff;
+          padding: 9px 18px;
+          border-radius: 8px;
+          background: #2357d8;
+          box-shadow: 0 4px 12px rgba(35, 87, 216, 0.2);
+          transition: all 0.2s ease;
+        }
+
+        .ag-mega-footer-btn-fill:hover {
+          background: #123b71;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 15px rgba(18, 59, 113, 0.3);
         }
         .ag-dropdown-inner {
-          padding: 20px;
+          display: flex;
+          height: 100%;
+        }
+        .ag-dropdown-featured {
+          flex: 0 0 260px;
+          background: linear-gradient(165deg, #123b71 0%, #0d284d 100%);
+          color: #fff;
+          padding: 32px 24px;
+          display: flex;
+          flex-direction: column;
+          position: relative;
+          overflow: hidden;
+        }
+        .ag-dropdown-featured::before {
+          content: '';
+          position: absolute;
+          top: -20%;
+          right: -20%;
+          width: 200px;
+          height: 200px;
+          background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+          border-radius: 50%;
+        }
+        .ag-featured-content {
+          position: relative;
+          z-index: 1;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+        .ag-featured-title {
+          font-size: 18px;
+          font-weight: 800;
+          margin: 0 0 20px 0;
+          line-height: 1.3;
+          color: #fff;
+        }
+        .ag-featured-list {
+          list-style: none;
+          padding: 0;
+          margin: 0 0 30px 0;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .ag-featured-item {
+          font-size: 13px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.9);
+        }
+        .ag-featured-tick {
+          color: #10b981;
+          font-weight: 800;
+        }
+        .ag-featured-cta {
+          margin-top: auto;
+          background: #fff;
+          color: #123b71;
+          text-decoration: none;
+          padding: 12px 20px;
+          border-radius: 12px;
+          font-size: 13px;
+          font-weight: 700;
+          text-align: center;
+          transition: all 0.2s ease;
+        }
+        .ag-featured-cta:hover {
+          background: #eef4ff;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .ag-dropdown-main {
+          flex: 1;
+          padding: 24px;
+        }
+        .ag-dropdown.is-categorized {
+          width: 1040px;
+        }
+        .ag-dropdown-categories {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 32px;
+          margin-top: 10px;
+        }
+        .ag-category-title {
+          font-size: 11px;
+          font-weight: 800;
+          color: #94a3b8;
+          letter-spacing: 0.05em;
+          margin-bottom: 12px;
+          padding-left: 12px;
+        }
+        .ag-category-list {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .ag-dropdown-icon.small {
+          font-size: 18px;
+          width: 32px;
+          height: 32px;
         }
         .ag-dropdown-header {
           display: flex;
@@ -336,18 +1000,20 @@ const Navbar = ({ openContact }) => {
           display: flex;
           align-items: center;
           gap: 12px;
-          padding: 12px;
+          padding: 10px 12px;
           border-radius: 12px;
           text-decoration: none;
-          transition: background 0.2s ease;
+          transition: all 0.2s ease;
         }
         .ag-dropdown-item:hover {
           background: #f8faff;
+          transform: translateX(4px);
         }
         .ag-dropdown-icon {
           font-size: 26px;
           width: 42px;
           height: 42px;
+          flex-shrink: 0;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -376,6 +1042,17 @@ const Navbar = ({ openContact }) => {
         .ag-dropdown-item:hover .ag-dropdown-arrow {
           opacity: 1;
           transform: translateX(4px);
+        }
+        
+        .ag-nav-link.active {
+          background: #eef4ff;
+          color: #2357d8;
+        }
+        .ag-nav-link.active .ag-arrow-svg {
+          transform: rotate(180deg);
+        }
+        .ag-arrow-svg {
+          transition: transform 0.2s ease;
         }
 
         .ag-mobile-toggle {
@@ -445,6 +1122,55 @@ const Navbar = ({ openContact }) => {
         .ag-mobile-arrow.rotated {
           transform: rotate(180deg);
         }
+        
+        .ag-mobile-featured {
+          background: linear-gradient(135deg, #123b71 0%, #0d284d 100%);
+          margin: 10px;
+          padding: 20px;
+          border-radius: 16px;
+          color: #fff;
+        }
+        .ag-mobile-featured-title {
+          font-size: 16px;
+          font-weight: 800;
+          margin-bottom: 15px;
+        }
+        .ag-mobile-featured-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          margin-bottom: 20px;
+        }
+        .ag-mobile-featured-item {
+          font-size: 12px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: rgba(255, 255, 255, 0.9);
+        }
+        .ag-mobile-featured-tick {
+          color: #10b981;
+          font-weight: 800;
+        }
+        .ag-mobile-featured-cta {
+          display: block;
+          background: #fff;
+          color: #123b71;
+          text-decoration: none;
+          padding: 10px;
+          border-radius: 10px;
+          font-size: 13px;
+          font-weight: 700;
+          text-align: center;
+        }
+        .ag-mobile-category-title {
+          font-size: 11px;
+          font-weight: 800;
+          color: #64748b;
+          padding: 16px 16px 8px;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
 
         @media (max-width: 1080px) {
           .ag-nav-spacer {
@@ -503,6 +1229,17 @@ const Navbar = ({ openContact }) => {
             background: #eef4ff;
             border-color: #bfd4ff;
           }
+
+          .ag-profile {
+            cursor: pointer;
+            transition: all 0.2s ease;
+          }
+          .ag-profile:hover {
+            background: #eef4ff;
+            color: #123b71;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+          }
         }
         @media (max-width: 640px) {
           .ag-nav-spacer {
@@ -545,23 +1282,46 @@ const Navbar = ({ openContact }) => {
               {navItems.map((item) => {
                 if (item.label === 'Contact') {
                   return (
-                    <button
+                    <Link
                       key={item.label}
+                      to="/contact"
                       className="ag-nav-link"
-                      onClick={handleContactClick}
                     >
                       <span>{item.label}</span>
-                    </button>
+                    </Link>
                   );
                 }
                 const dropdownData = dropdownContent[item.label];
+                
+                // Construct the base category link (e.g., Services -> /services)
+                const categoryPath = `/${item.label.toLowerCase().replace(/\s+/g, '-')}`;
+
                 return (
-                  <div key={item.label} className="ag-nav-item">
-                    <button className="ag-nav-link">
+                  <div 
+                    key={item.label} 
+                    className="ag-nav-item"
+                    onMouseEnter={() => setActiveDropdown(item.label)}
+                    onMouseLeave={() => setActiveDropdown(null)}
+                  >
+                    <Link 
+                      to={categoryPath}
+                      className={`ag-nav-link ${activeDropdown === item.label ? 'active' : ''}`}
+                      onClick={() => handleNavClick(item.label)}
+                    >
                       <span>{item.label}</span>
-                      {item.hasArrow && <ArrowIcon />}
-                    </button>
-                    {dropdownData && <DesktopDropdown label={item.label} data={dropdownData} />}
+                      {item.hasArrow && (
+                        <span className="ag-arrow-svg">
+                           <ArrowIcon />
+                        </span>
+                      )}
+                    </Link>
+                    {dropdownData && (
+                      <DesktopDropdown 
+                        label={item.label} 
+                        data={dropdownData} 
+                        isOpen={activeDropdown === item.label} 
+                      />
+                    )}
                   </div>
                 );
               })}
@@ -573,8 +1333,8 @@ const Navbar = ({ openContact }) => {
             <button 
               type="button" 
               className="ag-profile" 
-              aria-label="Open contact" 
-              onClick={handleContactClick}
+              aria-label="Open login" 
+              onClick={handleLoginClick}
             >
               <UserIcon />
             </button>
@@ -594,22 +1354,32 @@ const Navbar = ({ openContact }) => {
         {/* Mobile Navigation Panel */}
         <div className={`ag-mobile-panel${menuOpen ? ' open' : ''}`}>
           <div className="ag-mobile-links">
+            <button
+              className="ag-mobile-link"
+              onClick={(e) => {
+                handleLoginClick(e);
+                setMenuOpen(false);
+              }}
+              style={{ background: '#123b71', color: '#fff', border: 'none' }}
+            >
+              <span>Member Login</span>
+              <UserIcon />
+            </button>
+
             {navItems.map((item) => {
               const dropdownData = dropdownContent[item.label];
               
               if (item.label === 'Contact') {
                 return (
-                  <button
+                  <Link
                     key={item.label}
+                    to="/contact"
                     className="ag-mobile-link"
-                    onClick={(e) => {
-                      handleContactClick(e);
-                      setMenuOpen(false);
-                    }}
+                    onClick={() => setMenuOpen(false)}
                   >
                     <span>{item.label}</span>
                     <UserIcon />
-                  </button>
+                  </Link>
                 );
               }
               
@@ -627,20 +1397,64 @@ const Navbar = ({ openContact }) => {
                       </span>
                     </button>
                     <div className={`ag-mobile-submenu ${isOpen ? 'open' : ''}`}>
-                      {dropdownData.items.map((subItem, idx) => (
-                        <Link
-                          key={idx}
-                          to={subItem.link}
-                          className="ag-mobile-subitem"
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          <span className="ag-mobile-subitem-icon">{subItem.icon}</span>
-                          <div className="ag-mobile-subitem-content">
-                            <div className="ag-mobile-subitem-name">{subItem.name}</div>
-                            <div className="ag-mobile-subitem-desc">{subItem.description}</div>
+                      {dropdownData.featured && (
+                        <div className="ag-mobile-featured">
+                          <div className="ag-mobile-featured-title">{dropdownData.featured.title}</div>
+                          <div className="ag-mobile-featured-list">
+                            {dropdownData.featured.benefits.map((benefit, i) => (
+                              <div key={i} className="ag-mobile-featured-item">
+                                <span className="ag-mobile-featured-tick">✓</span>
+                                {benefit}
+                              </div>
+                            ))}
                           </div>
-                        </Link>
-                      ))}
+                          <Link 
+                            to={dropdownData.featured.link} 
+                            className="ag-mobile-featured-cta"
+                            onClick={() => setMenuOpen(false)}
+                          >
+                            {dropdownData.featured.cta}
+                          </Link>
+                        </div>
+                      )}
+                      {dropdownData.categories ? (
+                        <div className="ag-mobile-categories">
+                          {dropdownData.categories.filter(cat => cat !== null).map((cat, idx) => (
+                            <div key={idx} className="ag-mobile-category">
+                              <div className="ag-mobile-category-title">{cat.title}</div>
+                              {cat.items.map((subItem, i) => (
+                                <Link
+                                  key={i}
+                                  to={subItem.link}
+                                  className="ag-mobile-subitem"
+                                  onClick={() => setMenuOpen(false)}
+                                >
+                                  <span className="ag-mobile-subitem-icon">{subItem.icon}</span>
+                                  <div className="ag-mobile-subitem-content">
+                                    <div className="ag-mobile-subitem-name">{subItem.name}</div>
+                                    <div className="ag-mobile-subitem-desc">{subItem.description}</div>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        dropdownData.items.map((subItem, idx) => (
+                          <Link
+                            key={idx}
+                            to={subItem.link}
+                            className="ag-mobile-subitem"
+                            onClick={() => setMenuOpen(false)}
+                          >
+                            <span className="ag-mobile-subitem-icon">{subItem.icon}</span>
+                            <div className="ag-mobile-subitem-content">
+                              <div className="ag-mobile-subitem-name">{subItem.name}</div>
+                              <div className="ag-mobile-subitem-desc">{subItem.description}</div>
+                            </div>
+                          </Link>
+                        ))
+                      )}
                     </div>
                   </div>
                 );

@@ -55,23 +55,17 @@ const Footer = () => {
     <footer className="relative overflow-hidden bg-[#111827] text-white" style={{ fontFamily: "'Inter', sans-serif" }}>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.10),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(147,51,234,0.10),_transparent_24%)]" />
 
-      {/* Main footer content with equal left and right margin gaps - 40px on each side */}
-      <div 
-        className="relative pb-8 pt-20"
-        style={{
-          marginLeft: '40px',
-          marginRight: '40px'
-        }}
-      >
-        <div className="mx-auto w-full">
+      {/* Main footer content with generous 2-inch side gaps for a high-end 'boxed' layout */}
+      <div className="relative pb-8 pt-20">
+        <div className="mx-auto max-w-[1400px] px-8 sm:px-14 lg:px-24 xl:px-[192px]">
           <div className="grid grid-cols-1 gap-14 xl:grid-cols-[1.2fr_1fr_0.95fr_0.95fr_1.1fr]">
             {/* Column 1 - Brand Info */}
             <div>
               <Link to="/" className="mb-7 flex items-center gap-4 w-max">
-                <img src={agraniLogo} alt="Agrani Digital" className="h-16 w-auto rounded-2xl bg-white p-1.5" />
+                <img src={agraniLogo} alt="Agrani Digital" className="h-16 w-auto rounded-2xl bg-white p-1.5 shadow-[0_0_20px_rgba(255,255,255,0.1)]" />
                 <div>
-                  <div className="text-[18px] font-[800] tracking-[-0.03em] text-white">Agrani Digital</div>
-                  <div className="text-[13px] font-medium text-[#7cb0ff]">Building AI-Powered Software & SaaS</div>
+                  <div className="font-['Outfit'] text-[22px] font-[800] tracking-[-0.03em] text-white">Agrani Digital</div>
+                  <div className="text-[14px] font-medium text-[#7cb0ff]">Building AI-Powered Software & SaaS</div>
                 </div>
               </Link>
 
@@ -103,7 +97,7 @@ const Footer = () => {
 
             {/* Column 2 - Services */}
             <div>
-              <div className="mb-7 flex items-center gap-3 text-[20px] font-[800] tracking-[-0.03em] text-white">
+              <div className="mb-7 flex items-center gap-3 font-['Outfit'] text-[20px] font-[800] tracking-[-0.03em] text-white">
                 <SectionIcon color="#60a5fa">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 0 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 0-2-2V9m0 0h18" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
@@ -125,7 +119,7 @@ const Footer = () => {
 
             {/* Column 3 - Products */}
             <div>
-              <div className="mb-7 flex items-center gap-3 text-[20px] font-[800] tracking-[-0.03em] text-white">
+              <div className="mb-7 flex items-center gap-3 font-['Outfit'] text-[20px] font-[800] tracking-[-0.03em] text-white">
                 <SectionIcon color="#4ade80">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M12 3c2.8 0 5 2.2 5 5 0 4.6-5 10-5 10S7 12.6 7 8c0-2.8 2.2-5 5-5Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
@@ -148,7 +142,7 @@ const Footer = () => {
 
             {/* Column 4 - Company */}
             <div>
-              <div className="mb-7 flex items-center gap-3 text-[20px] font-[800] tracking-[-0.03em] text-white">
+              <div className="mb-7 flex items-center gap-3 font-['Outfit'] text-[20px] font-[800] tracking-[-0.03em] text-white">
                 <SectionIcon color="#c084fc">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M7 3h10a2 2 0 0 1 2 2v14l-3-2-2 2-2-2-2 2-3-2V5a2 2 0 0 1 2-2Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />

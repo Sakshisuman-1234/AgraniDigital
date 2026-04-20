@@ -9,6 +9,8 @@ import CASESTUDY from './Pages/CASESTUDY'
 import CAREERS from './Pages/CAREERS'
 import BLOGS from './Pages/BLOGS'
 import CONTACT from './Pages/CONTACT'
+import Login from './Pages/Login'
+import SolutionDetail from './Pages/SolutionDetail'
 import ContactDrawer from './Components/ContactDrawer'
 import './App.css'
 
@@ -33,6 +35,28 @@ function App() {
         <Route path="/careers" element={<CAREERS />} />
         <Route path="/blogs" element={<BLOGS />} />
         <Route path="/contact" element={<CONTACT />} />
+        <Route path="/login" element={<Login />} />
+        
+        {/* Dynamic Detail Routes */}
+        <Route path="/services/:id" element={<SolutionDetail />} />
+        <Route path="/products/:id" element={<SolutionDetail />} />
+        <Route path="/industries/:id" element={<SolutionDetail />} />
+        <Route path="/case-studies/:id" element={<SolutionDetail />} />
+        
+        {/* Landing Page Routes (Clicking the main labels) */}
+        <Route path="/services" element={<EXPERTISE />} />
+        <Route path="/products" element={<SOLUTION />} />
+        <Route path="/industries" element={<SolutionDetail />} />
+        <Route path="/corporate" element={<AboutUs />} />
+        
+        {/* Corporate & Misc Routes mapped to Dynamic View */}
+        <Route path="/mission" element={<SolutionDetail />} />
+        <Route path="/leadership" element={<SolutionDetail />} />
+        <Route path="/values" element={<SolutionDetail />} />
+        <Route path="/life" element={<SolutionDetail />} />
+        <Route path="/internships" element={<SolutionDetail />} />
+        <Route path="/demo" element={<SolutionDetail />} />
+        <Route path="/contact/sales" element={<SolutionDetail />} />
       </Routes>
       
       {/* Global Contact Drawer mapping (optional fallback if needed) */}
