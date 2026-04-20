@@ -41,7 +41,7 @@ function MenuIcon({ open }) {
   );
 }
 
-const Navbar = ({ openContact }) => {
+const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpenMenus, setMobileOpenMenus] = useState({});
@@ -49,6 +49,7 @@ const Navbar = ({ openContact }) => {
   const navigate = useNavigate();
   
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMenuOpen(false);
     setMobileOpenMenus({});
     setActiveDropdown(null);
@@ -73,15 +74,6 @@ const Navbar = ({ openContact }) => {
       ...prev,
       [label]: !prev[label]
     }));
-  };
-
-  const handleContactClick = (e) => {
-    e.preventDefault();
-    if (openContact && typeof openContact === 'function') {
-      openContact();
-    } else {
-      navigate('/contact');
-    }
   };
 
   const handleLoginClick = (e) => {

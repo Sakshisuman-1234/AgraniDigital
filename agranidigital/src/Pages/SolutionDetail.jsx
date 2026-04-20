@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import Navbar from '../Components/Navbar';
 import { dropdownContent } from '../data/navigationData';
 
 const SolutionDetail = () => {
   const { id } = useParams();
+  const location = useLocation();
   const [content, setContent] = useState(null);
   const [activeCategory, setActiveCategory] = useState('');
 
   useEffect(() => {
     // Detect category from pathname (e.g., /services/gen-ai -> services)
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const pathParts = location.pathname.split('/').filter(Boolean);
     const categoryFromPath = pathParts[0] || '';
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveCategory(categoryFromPath);
 
-    const path = window.location.pathname;
+    const path = location.pathname;
     
     // Normalize category key for lookup (e.g., 'services' -> 'Services')
     const categoryKey = Object.keys(dropdownContent).find(
@@ -49,7 +51,7 @@ const SolutionDetail = () => {
 
     setContent(foundItem);
     window.scrollTo(0, 0);
-  }, [id, window.location.pathname]);
+  }, [id, location.pathname]);
 
   if (!content) {
     return (

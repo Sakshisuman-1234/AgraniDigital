@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
-  const [expandedBox, setExpandedBox] = useState(null);
-  const [activeTab, setActiveTab] = useState('whatsapp');
-
   const capabilities = [
     { id: 1, title: 'Core Capabilities', subtitle: 'AI & ML', description: 'Intelligent automation & analytics.', icon: '🧠', iconBg: '#e0e7ff' },
     { id: 2, title: 'Core Capabilities', subtitle: 'Cloud Solutions', description: 'Scalable & secure infrastructure.', icon: '☁️', iconBg: '#d1fae5' },
@@ -17,10 +14,6 @@ const HeroSection = () => {
     { id: 2, value: '20+', label: 'Expert Team', icon: '👥', color: '#059669' },
     { id: 3, value: '24/7', label: 'Dedicated Support', icon: '🛡️', color: '#d97706' }
   ];
-
-  const toggleExpand = (id) => {
-    setExpandedBox(expandedBox === id ? null : id);
-  };
 
   return (
     <>

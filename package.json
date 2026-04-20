@@ -1,8 +1,8 @@
 {
   "scripts": {
-    "dev": "npm run dev --prefix agranidigital",
-    "build": "npm run build --prefix agranidigital",
-    "preview": "npm run preview --prefix agranidigital"
+    "dev": "cd agranidigital && npm run dev",
+    "build": "cd agranidigital && npm run build",
+    "preview": "cd agranidigital && npm run preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",
@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.27",
+    "gh-pages": "^6.3.0",
     "postcss": "^8.5.9",
     "tailwindcss": "^4.2.2"
   }
