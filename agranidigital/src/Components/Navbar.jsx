@@ -381,13 +381,14 @@ const Navbar = () => {
 
           {/* Fixed Footer Strip (Patti) */}
           <div className="ag-mega-footer-strip">
-             <div className="ag-mega-footer-left">
+             <Link to="/contact" className="ag-mega-footer-left" style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}>
                 <span className="ag-mega-footer-icon">🎧</span>
                 <div className="ag-mega-footer-text">
                   <strong>Need Expert Advice?</strong>
                   <span>Talk to our experts today</span>
                 </div>
-             </div>
+                <span style={{ marginLeft: '8px', fontSize: '14px', color: '#2357d8', fontWeight: '700' }}>→</span>
+             </Link>
              <div className="ag-mega-footer-right">
                 <Link to="/schedule" className="ag-mega-footer-btn-outline">
                    Schedule a Call
@@ -792,6 +793,19 @@ const Navbar = () => {
           display: flex;
           align-items: center;
           gap: 12px;
+          padding: 8px 16px;
+          border-radius: 10px;
+          transition: all 0.25s ease;
+          cursor: pointer;
+        }
+
+        .ag-mega-footer-left:hover {
+          background: #eef4ff;
+          transform: translateX(4px);
+        }
+
+        .ag-mega-footer-left:hover strong {
+          color: #2357d8;
         }
 
         .ag-mega-footer-icon {

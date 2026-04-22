@@ -10,6 +10,8 @@ import CAREERS from './Pages/CAREERS'
 import BLOGS from './Pages/BLOGS'
 import CONTACT from './Pages/CONTACT'
 import Login from './Pages/Login'
+import ScheduleCall from './Pages/ScheduleCall'
+import FreeConsultation from './Pages/FreeConsultation'
 import SolutionDetail from './Pages/SolutionDetail'
 import ContactDrawer from './Components/ContactDrawer'
 import './App.css'
@@ -36,6 +38,8 @@ function App() {
         <Route path="/blogs" element={<BLOGS />} />
         <Route path="/contact" element={<CONTACT />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/schedule" element={<ScheduleCall />} />
+        <Route path="/consultation" element={<FreeConsultation />} />
         
         {/* Dynamic Detail Routes */}
         <Route path="/services/:id" element={<SolutionDetail />} />
